@@ -1,12 +1,28 @@
 import json
 import os
 import pika
+import logging
 import subprocess
 import requests
 import tempfile
 
-credentials = pika.PlainCredentials(os.environ['RABBITMQ_USER'], os.environ['RABBITMQ_PASSWORD'])
-parameters = pika.ConnectionParameters(host=os.environ['RABBITMQ_HOST'], port=5672, virtual_host='/', credentials=credentials)
+
+logging.basicConfig(
+    format='%(asctime)s %(message)s',
+    filename='check.log',
+    level=logging.INFO
+)
+
+credentials = pika.PlainCredentials(
+    os.environ['RABBITMQ_USER'],
+    os.environ['RABBITMQ_PASSWORD']
+)
+parameters = pika.ConnectionParameters(
+    host=os.environ['RABBITMQ_HOST'],
+    port=5672,
+    virtual_host='/',
+    credentials=credentials
+)
 
 try:
     with pika.BlockingConnection(parameters) as conn:
@@ -17,7 +33,7 @@ try:
 #        method_frame, header_frame, body = channel.basic_get('hpc-jobs')
         if result[0]:
             # Handle the incoming job in Slurm
-            print("Job received from queue")
+            logger.info("Job received from queue")
             # Get settings for Slurm
             message = json.loads(result[2].decode('utf-8'))
             inputs = message['inputs']
@@ -30,12 +46,12 @@ try:
             payload = {'username': os.environ['RODAN_USER'], 'password': os.environ['RODAN_PASSWORD']}
             response = requests.post('http://' + os.environ['RODAN_HOST'] + '/auth/token/', data=payload)
             if not response.ok:
-                print("Error > Bad response from server (" + response.url + ")")
-                print("      > " + response.text)
+                logger.error("Bad response from server (" + response.url + ")")
+                logger.error(response.text)
                 quit()
 
             settings['token'] = response.json()['token']
-            message['settings'] = settings 
+            message['settings'] = settings
 
             # Output the JSON body contents
             with tempfile.NamedTemporaryFile(dir=".", delete=False) as f:
@@ -53,3 +69,5 @@ try:
             channel.basic_ack(result[0].delivery_tag)
 except pika.exceptions.AMQPConnectionError:
     pass
+except Exception as e:
+    logger.error(e)
