@@ -1,7 +1,7 @@
 #!/bin/sh
 #SBATCH --account=def-ichiro
 #SBATCH --gres=gpu:1
-#SBATCH --output=%N-%j.out
+#SBATCH --output=logs/%N-%j.out
 
 module load python/3.7.4
 virtualenv --no-download $SLURM_TMPDIR/env
