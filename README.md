@@ -1,6 +1,6 @@
 # HPC Fast Trainer - HPC Component
 
-This component runs the patchwise analysis training job and sends results back to Rodan.
+This component runs the patchwise analysis training job and sends results back to [the Rodan task](https://github.com/JRegimbal/hpc-fast-trainer).
 There are x major steps:
 
 1. Connect to HPC-RabbitMQ and check if there is a job to run.
