@@ -6,7 +6,7 @@ set -o xtrace
 
 cd "${0%/*}"
 echo "$(date -Is) Loading environment"
-source local_credentials.env
+source credentials.env
 source env/bin/activate
 
 echo "$(date -Is) Starting check.py"
