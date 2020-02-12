@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o xtrace
+
+echo "$(date -Is) Loading environment"
+source local_credentials.env
+source env/bin/activate
+
+echo "$(date -Is) Starting check.py"
+python check.py
