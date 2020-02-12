@@ -126,7 +126,7 @@ try:
     body = json.dumps(results)
 except Exception as e:
     # We need to reply with something since the initial message was ACKed
-    body = json.dumps({'error': e})
+    body = json.dumps({'error': str(e)})
     logging.error(e)
 finally:
     send_to_rabbitmq(response_queue, correlation_id, body)
