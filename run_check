@@ -4,9 +4,11 @@ set -o errexit
 set -o nounset
 set -o xtrace
 
+cd "${0%/*}"
 echo "$(date -Is) Loading environment"
 source local_credentials.env
 source env/bin/activate
 
 echo "$(date -Is) Starting check.py"
 python check.py
+echo "$(date -Is) Finished check.py"
