@@ -33,9 +33,29 @@ job.
 
 * `calvo_requirements.txt`: The Python dependencies for the trainer.
 * `check.py`: Script that checks for a new job and submits a new Slurm job if one exists.
+* `credentials.env`: File containing the credentials to log into Rodan and RabbitMQ.
+*You must fill this file out!*
 * `fast_calvo_trainer.py` and `training_engine_saw.py`: Actual patchwise trainer files.
 * `hpc_training.sh`: Script defining the Slurm job and some batch parameters.
 * `README.md`: This file!
 * `requirements.txt`: Dependencies for `check.py`.
 * `run_calvo_trainer_mq.py`: Script run in the Slurm worker that performs the training and submits the results.
 * `run_check`: A file to be added to the crontab to intermittently run `check.py`.
+
+# Set Up
+
+1. Clone this repository somewhere where jobs can be scheduled. This is either `scratch` or a project directory.
+2. Change directory to this repository's contents, which will now just be called `$PATH_TO_REPO`.
+3. Set up a virtual environment for Python 3.7 and install the necessary dependencies.
+```bash
+module load python/3.7
+virtualenv env
+source env/bin/activate
+pip install -r requirements.txt
+```
+4. Fill in the values in `credentials.env`.
+5. Add `run_check` to your crontab. For example to check for jobs every hour on the hour and log to a file
+called `logs/run_check.log`, run `crontab -e` and add the following line:
+```sh
+0 * * * * $PATH_TO_REPO/run_check >> $PATH_TO_REPO/logs/run_check.log 2>&1
+```
