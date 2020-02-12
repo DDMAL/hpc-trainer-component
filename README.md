@@ -44,7 +44,8 @@ job.
 
 # Set Up
 
-1. Clone this repository somewhere where jobs can be scheduled. This is either `scratch` or a project directory.
+1. Clone this repository [somewhere where jobs can be scheduled](https://docs.computecanada.ca/wiki/Running_jobs#Cluster_particularities).
+This is either `scratch` or a project directory on Cedar.
 2. Change directory to this repository's contents, which will now just be called `$PATH_TO_REPO`.
 3. Set up a virtual environment for Python 3.7 and install the necessary dependencies.
 ```bash
