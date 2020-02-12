@@ -28,3 +28,14 @@ Note that allocating too little time/memory will result in the job failing. If t
 happens the job on Rodan may hang indefinitely. Also note that allocating too many
 resources will result in the scheduler taking a long time to actually start the
 job.
+
+## The Files
+
+* `calvo_requirements.txt`: The Python dependencies for the trainer.
+* `check.py`: Script that checks for a new job and submits a new Slurm job if one exists.
+* `fast_calvo_trainer.py` and `training_engine_saw.py`: Actual patchwise trainer files.
+* `hpc_training.sh`: Script defining the Slurm job and some batch parameters.
+* `README.md`: This file!
+* `requirements.txt`: Dependencies for `check.py`.
+* `run_calvo_trainer_mq.py`: Script run in the Slurm worker that performs the training and submits the results.
+* `run_check`: A file to be added to the crontab to intermittently run `check.py`.
