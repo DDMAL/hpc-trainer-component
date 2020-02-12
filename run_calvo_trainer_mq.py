@@ -66,9 +66,9 @@ try:
     settings = body['settings']
 
     # Download Resources
-    logging.info("Downloading resources...")
     base_url = "http://" + os.environ["RABBITMQ_HOST"]
     headers = {'Authorization': 'Token ' + settings['token']}
+    logging.info("Downloading resources from " + base_url)
 
     IMAGE_RES = os.path.join(slurm_dir, "image.png")
     BG_RES = os.path.join(slurm_dir, "background.png")
