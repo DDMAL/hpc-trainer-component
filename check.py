@@ -40,6 +40,7 @@ try:
             n_cpu = settings['CPUs']
             mem = settings['Maximum memory (MB)']
             time = settings['Maximum time (D-HH:MM)']
+            mail = settings['Slurm Notification Email']
 
             # Authenticate User
             payload = {'username': os.environ['RODAN_USER'], 'password': os.environ['RODAN_PASSWORD']}
@@ -55,7 +56,7 @@ try:
             # Output the JSON body contents
             with tempfile.NamedTemporaryFile(dir=".", delete=False) as f:
                 f.write(json.dumps(message).encode('utf-8'))
-                subprocess.run([
+                run_array = [
                     'sbatch',
                     '--cpus-per-task='+str(n_cpu),
                     '--mem='+str(mem)+'M',
@@ -64,7 +65,11 @@ try:
                     f.name,
                     result[1].reply_to,
                     result[1].correlation_id
-                ])
+                ]
+                if len(mail) > 0:
+                    run_array.insert(1, '--mail-type=ALL')
+                    run_array.insert(1, '--mail-user=' + mail)
+                subprocess.run(run_array)
             channel.basic_ack(result[0].delivery_tag)
         else:
             logging.info("No job present.")
