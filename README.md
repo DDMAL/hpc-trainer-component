@@ -53,7 +53,13 @@ virtualenv env
 source env/bin/activate
 pip install -r requirements.txt
 ```
-4. Fill in the values in `credentials.env`.
+4. Export the proper environment variables in `credentials.env`. This *must* include:
+  * `RABBITMQ_USER`, the user account for RabbitMQ.
+  * `RABBITMQ_PASSWORD`, the corresponding password for RabbitMQ.
+  * `RABBITMQ_HOST`, the IP address or host where RabbitMQ is on port 5672.
+  * `RODAN_USER`, the user account for Rodan.
+  * `RODAN_PASSWORD`, the corresponding password for Rodan.
+  * `RODAN_HOST`, the IP address or host where the Rodan API is on port 80.
 5. Add `run_check` to your crontab. For example to check for jobs every hour on the hour and log to a file
 called `logs/run_check.log`, run `crontab -e` and add the following line:
 ```sh
