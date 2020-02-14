@@ -3,6 +3,7 @@ import base64
 import os
 import logging
 import json
+import ssl
 import sys
 import requests
 import pika
@@ -15,15 +16,18 @@ logging.basicConfig(
 
 
 def send_to_rabbitmq(response_queue, correlation_id, body):
+    context = ssl.create_default_context()
+    ssl_options = pika.SSLOptions(context)
     credentials = pika.PlainCredentials(
         os.environ["RABBITMQ_USER"],
         os.environ["RABBITMQ_PASSWORD"]
     )
     parameters = pika.ConnectionParameters(
         os.environ["RABBITMQ_HOST"],
-        5672,
+        5671,
         "/",
-        credentials
+        credentials,
+        ssl_options=ssl_options
     )
     with pika.BlockingConnection(parameters) as conn:
         channel = conn.channel()

@@ -2,6 +2,7 @@ import json
 import os
 import pika
 import logging
+import ssl
 import subprocess
 import requests
 import tempfile
@@ -13,15 +14,18 @@ logging.basicConfig(
     level=logging.INFO
 )
 
+context = ssl.create_default_context()
+ssl_options = pika.SSLOptions(context, os.environ['RABBITMQ_HOST'])
 credentials = pika.PlainCredentials(
     os.environ['RABBITMQ_USER'],
     os.environ['RABBITMQ_PASSWORD']
 )
 parameters = pika.ConnectionParameters(
     host=os.environ['RABBITMQ_HOST'],
-    port=5672,
+    port=5671,
     virtual_host='/',
-    credentials=credentials
+    credentials=credentials,
+    ssl_options=ssl_options
 )
 
 try:
