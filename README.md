@@ -66,3 +66,5 @@ called `logs/run_check.log`, run `crontab -e` and add the following line:
 ```sh
 0 * * * * $PATH_TO_REPO/run_check >> $PATH_TO_REPO/logs/run_check.log 2>&1
 ```
+
+*Note about cron: Environment variables don't carry into cron so make sure to set `SSL_CERT_FILE` to the correct value somewhere within the job so that Python's SSL module can actually check for valid CAs.*
