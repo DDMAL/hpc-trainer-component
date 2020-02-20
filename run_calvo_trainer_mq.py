@@ -17,7 +17,7 @@ logging.basicConfig(
 
 def send_to_rabbitmq(response_queue, correlation_id, body):
     context = ssl.create_default_context()
-    ssl_options = pika.SSLOptions(context)
+    ssl_options = pika.SSLOptions(context, os.environ["RABBITMQ_HOST"])
     credentials = pika.PlainCredentials(
         os.environ["RABBITMQ_USER"],
         os.environ["RABBITMQ_PASSWORD"]
