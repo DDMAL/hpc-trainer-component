@@ -34,7 +34,7 @@ try:
         channel.queue_declare(queue='hpc-jobs')
         # Check if there is an incoming job
         result = channel.basic_get('hpc-jobs')
-        if result[0]:
+        while result[0]:
             # Handle the incoming job in Slurm
             logging.info("Job received from queue")
             # Get settings for Slurm
@@ -75,6 +75,7 @@ try:
                     run_array.insert(1, '--mail-user=' + mail)
                 subprocess.run(run_array)
             channel.basic_ack(result[0].delivery_tag)
+            result = channel.basic_get('hpc-jobs')  # Check for additional unscheduled jobs.
         else:
             logging.info("No job present.")
 except pika.exceptions.AMQPConnectionError:
