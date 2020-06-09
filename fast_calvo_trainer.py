@@ -37,6 +37,7 @@ class FastCalvoTrainer:
         patch_height = self.settings['Patch height']
         patch_width = self.settings['Patch width']
         max_number_of_epochs = self.settings['Maximum number of training epochs']
+        max_samples = self.settings['Max number of samples per label']
 
         output_models_path = { 'background': self.outputs['Background Model'],
                         'symbols': self.outputs['Music Symbol Model'],
@@ -45,11 +46,12 @@ class FastCalvoTrainer:
                         }
 
         # Call in training function
-        status = training.train_msae(input_image,gt,
-                                      height=patch_height,
-                                      width=patch_width,
-                                      output_path=output_models_path,
-                                      epochs=max_number_of_epochs)
+        status = training.train_msae(input_image, gt,
+                                     height=patch_height,
+                                     width=patch_width,
+                                     output_path=output_models_path,
+                                     epochs=max_number_of_epochs,
+                                     max_samples_per_class=max_samples)
 
         print('Finishing the Fast CM trainer job.')
         return True
