@@ -16,6 +16,7 @@ logging.basicConfig(
 
 
 def send_to_rabbitmq(response_queue, correlation_id, body):
+    logging.info("Response queue is (again): " + response_queue)
     context = ssl.create_default_context()
     ssl_options = pika.SSLOptions(context, os.environ["RABBITMQ_HOST"])
     credentials = pika.PlainCredentials(
@@ -58,6 +59,7 @@ try:
     args = parser.parse_args()
     input_file_path = args.input_file
     response_queue = args.callback_queue
+    logging.info("Callback queue: " + response_queue)
     correlation_id = args.correlation_id
 
     slurm_dir = os.environ["SLURM_TMPDIR"]
@@ -70,7 +72,7 @@ try:
     settings = body['settings']
 
     # Download Resources
-    base_url = "http://" + os.environ["RABBITMQ_HOST"]
+    base_url = "http://" + os.environ["RODAN_HOST"]
     headers = {'Authorization': 'Token ' + settings['token']}
     logging.info("Downloading resources from " + base_url)
 

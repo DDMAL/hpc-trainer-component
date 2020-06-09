@@ -53,8 +53,11 @@ try:
                 logging.error("Bad response from server (" + response.url + ")")
                 logging.error(response.text)
                 quit()
+            else:
+                logging.info("Received code " + str(response.text) + " on authorization")
 
             settings['token'] = response.json()['token']
+            logging.info("Token: " + settings['token'])
             message['settings'] = settings
 
             # Output the JSON body contents
@@ -70,6 +73,7 @@ try:
                     result[1].reply_to,
                     result[1].correlation_id
                 ]
+                logging.info("Reply queue: " + result[1].reply_to)
                 if len(mail) > 0:
                     run_array.insert(1, '--mail-type=ALL')
                     run_array.insert(1, '--mail-user=' + mail)
