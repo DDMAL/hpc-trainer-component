@@ -79,7 +79,7 @@ try:
                 if len(mail) > 0:
                     run_array.insert(1, '--mail-type=ALL')
                     run_array.insert(1, '--mail-user=' + mail)
-                subprocess.run(run_array)
+                subprocess.run(run_array, check=True)
             channel.basic_ack(result[0].delivery_tag)
             result = channel.basic_get('hpc-jobs')  # Check for additional unscheduled jobs.
         else:
