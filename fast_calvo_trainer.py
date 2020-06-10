@@ -37,7 +37,7 @@ class FastCalvoTrainer:
         patch_height = self.settings['Patch height']
         patch_width = self.settings['Patch width']
         max_number_of_epochs = self.settings['Maximum number of training epochs']
-        max_samples = self.settings['Max number of samples per label']
+        max_samples = self.settings['Maximum number of samples per label']
 
         output_models_path = { 'background': self.outputs['Background Model'],
                         'symbols': self.outputs['Music Symbol Model'],

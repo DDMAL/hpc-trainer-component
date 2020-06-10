@@ -47,8 +47,10 @@ try:
             mail = settings['Slurm Notification Email']
 
             # Authenticate User
+            auth_url = "http://{}/api/auth/token/".format(os.environ["RODAN_HOST"])
+            logging.info("Attempting to authenticate at {}...".format(auth_url))
             payload = {'username': os.environ['RODAN_USER'], 'password': os.environ['RODAN_PASSWORD']}
-            response = requests.post('http://' + os.environ['RODAN_HOST'] + '/auth/token/', data=payload)
+            response = requests.post(auth_url, data=payload)
             if not response.ok:
                 logging.error("Bad response from server (" + response.url + ")")
                 logging.error(response.text)
@@ -85,4 +87,5 @@ try:
 except pika.exceptions.AMQPConnectionError:
     logging.info("Could not connect.")
 except Exception as e:
+    logging.error("EXCEPTION")
     logging.error(e)

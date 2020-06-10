@@ -70,6 +70,7 @@ try:
 
     inputs = body['inputs']
     settings = body['settings']
+    logging.info(settings)
 
     # Download Resources
     base_url = "http://" + os.environ["RODAN_HOST"]
