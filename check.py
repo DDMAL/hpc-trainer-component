@@ -66,7 +66,7 @@ try:
             if mem > 128000 and mem <= 192000:
                 gpu_req = "--gres=gpu:v100l:1"
             elif mem > 192000:
-                gpu_req = "--gres=gpu:p100l:1"
+                gpu_req = "--gres=gpu:p100l:4"
 
             # Output the JSON body contents
             with tempfile.NamedTemporaryFile(dir=".", delete=False) as f:
