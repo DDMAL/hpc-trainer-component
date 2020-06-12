@@ -62,12 +62,19 @@ try:
             logging.info("Token: " + settings['token'])
             message['settings'] = settings
 
+            gpu_req = "--gres=gpu:1"
+            if mem > 128000 and mem <= 192000:
+                gpu_req = "--gres=gpu:v100l:1"
+            elif mem > 192000:
+                gpu_req = "--gres=gpu:p100l:1"
+
             # Output the JSON body contents
             with tempfile.NamedTemporaryFile(dir=".", delete=False) as f:
                 f.write(json.dumps(message).encode('utf-8'))
                 run_array = [
                     'sbatch',
                     '--cpus-per-task='+str(n_cpu),
+                    gpu_req,
                     '--mem='+str(mem)+'M',
                     '--time='+str(time),
                     'hpc_training.sh',
