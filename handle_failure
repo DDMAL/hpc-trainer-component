@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --account=def-ichiro
+#SBATCH --output=logs/FAILURE-%N-%j.log
+#SBATCH --time=00:05:00
+
+source /etc/bashrc
+source calvo_env/bin/activate
+
+echo "STARTING FAILURE HANDLING"
+JOB_ID=$1
+CORRELATION=$2
+RESPONSE_QUEUE=$3
+
+echo "Correlation is $CORRELATION"
+echo "Responding to $RESPONSE_QUEUE"
+
+[[ $JOB_ID =~ "OUT_OF_M" ]] || python send_failure.py $RESPONSE_QUEUE $CORRELATION

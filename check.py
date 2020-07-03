@@ -86,7 +86,19 @@ try:
                 if len(mail) > 0:
                     run_array.insert(1, '--mail-type=ALL')
                     run_array.insert(1, '--mail-user=' + mail)
-                subprocess.run(run_array, check=True)
+                sub_result = subprocess.run(run_array, check=True, capture_output=True, text=True)
+                logging.info(sub_result.stdout)
+                job_id = sub_result.stdout.split(' ')[-1].strip()
+                logging.info("Preparing to submit dependency for job " + job_id)
+                subprocess.run([
+                    'sbatch',
+                    '--dependency=afterany:' + job_id,
+                    'handle_failure',
+                    job_id,
+                    result[1].correlation_id,
+                    result[1].reply_to
+                ], check=True)
+                logging.info("Dependency Submitted")
             channel.basic_ack(result[0].delivery_tag)
             result = channel.basic_get('hpc-jobs')  # Check for additional unscheduled jobs.
         else:

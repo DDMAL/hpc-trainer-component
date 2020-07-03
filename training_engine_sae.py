@@ -67,7 +67,7 @@ def get_sae(height, width, pretrained_weights = None):
 
 def getTrain(input_image, gt, patch_height, patch_width, max_samples_per_class):
     # Speed-up factor (TODO this should be a parameter of the job)
-    factor = 100.
+    factor = 100. 
 
     X_train = {}
     Y_train = {}
@@ -85,7 +85,7 @@ def getTrain(input_image, gt, patch_height, patch_width, max_samples_per_class):
     samples_per_class = max_samples_per_class
     for label in gt:
         samples_per_class = min(count[label], samples_per_class)
-
+    
     ratio = {}
     for label in gt:
         ratio[label] = factor * (samples_per_class/float(count[label]))
@@ -98,13 +98,13 @@ def getTrain(input_image, gt, patch_height, patch_width, max_samples_per_class):
             if rd.random() < 1./factor:
 
                 for label in gt:
-                    if gt[label][row][col] == 1:
-                        if rd.random() < ratio[label]:  # Take samples according to its ratio
+                    if gt[label][row][col] == 1:       
+                        if rd.random() < ratio[label]: # Take samples according to its ratio
                             from_x = row-(patch_height//2)
                             from_y = col-(patch_width//2)
 
                             sample_x = input_image[from_x:from_x+patch_height,from_y:from_y+patch_width]
-
+                            
                             # Pre-process (check that prediction does the same!)
                             sample_x = (255. - sample_x) / 255.
 
