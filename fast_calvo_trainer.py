@@ -22,7 +22,7 @@ class FastCalvoTrainer:
         gt = {}
         regions_mask = (regions[:, :, 3] == 255)
 
-        notes_mask = (lines[:, :, 3] == 255)
+        notes_mask = (notes[:, :, 3] == 255)
         gt['symbols'] = np.logical_and(notes_mask, regions_mask) #restrict layer to only the notes in the selected regions
 
         lines_mask = (lines[:, :, 3] == 255)
