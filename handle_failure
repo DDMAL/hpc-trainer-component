@@ -14,4 +14,9 @@ RESPONSE_QUEUE=$3
 echo "Correlation is $CORRELATION"
 echo "Responding to $RESPONSE_QUEUE"
 echo "$(sacct -j $JOB_ID -o State%15)"
-[[ "$(sacct -j $JOB_ID -o State%15)" =~ "OUT_OF_MEMORY" ]] && python send_failure.py $RESPONSE_QUEUE $CORRELATION || echo "All Okay"
+
+if [[ $(sacct -j $JOB_ID -o State%15 | grep -E "(FAILURE|OUT_OF_MEMORY)") ]]; then
+    python send_failure.py $RESPONSE_QUEUE $CORRELATION
+else
+    echo "Response already sent!"
+fi
