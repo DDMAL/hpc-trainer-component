@@ -79,55 +79,47 @@ try:
     # Input
     IMAGE_RES = os.path.join(slurm_dir, "image.png")
     BG_RES = os.path.join(slurm_dir, "background.png")
-    MS_RES = os.path.join(slurm_dir, "music.png")
     SR_RES = os.path.join(slurm_dir, "regions.png")
 
     # Output
     BM_RES = os.path.join(slurm_dir, "background.hdf5")
-    MM_RES = os.path.join(slurm_dir, "music.hdf5")
 
     # Download files from rodan
     download_resource(IMAGE_RES, base_url + body['inputs']['Image'], headers)
     download_resource(BG_RES, base_url + body['inputs']['Background'], headers)
-    download_resource(MS_RES, base_url + body['inputs']['Music Layer'], headers)
     download_resource(SR_RES, base_url + body['inputs']['Selected Regions'], headers)
 
     inputs = {
         "Image": IMAGE_RES,
         "Background": BG_RES,
-        "Music Layer": MS_RES,
         "Selected Regions": SR_RES
     }
     outputs = {
         "Background Model": BM_RES,
-        "Music Symbol Model": MM_RES,
     }
 
     # Handle Non-reqired resources
-    # Optional named-layers (Input and download)
+    # Optional named-layers (Input and download) "rgba PNG - Layer %d"
     for k in body["inputs"]:
-        if k == "Staff Layer":
-            SL_RES = os.path.join(slurm_dir, "staff.png")
-            SM_RES = os.path.join(slurm_dir, "staff.hdf5")
-            download_resource(SL_RES, base_url + body["inputs"]["Staff Layer"], headers)
-            inputs["Staff Layer"] = SL_RES
-        if k == "Text":
-            TL_RES = os.path.join(slurm_dir, "text.png")
-            TM_RES = os.path.join(slurm_dir, "text.hdf5")
-            download_resource(TL_RES, base_url + body["inputs"]["Text"], headers)
-            inputs["Text"] = TL_RES
+        if k[:17] == 'rgba PNG - Layer ':
+            l = k[17:18]
+            layer_file = "layer_%d.png" % l
+            model_file = "model_%d.png" % l
 
-    for k in body["outputs"]:
-        if k == "Staff Lines Model":
-            outputs["Staff Lines Model"] = SM_RES
-        if k == "Text Model":
-            outputs["Text Model"] = TM_RES
+            # Declare input filepath
+            inputs['rgba PNG - Layer %d' % l] = os.path.join(slurm_dir, layer_file)
+
+            # Download File
+            download_resource(layer_file, base_url + body["inputs"]["rgba PNG - Layer %d" % l], headers)
+
+            # Declare output filepath
+            outputs['Model %d' % l] = os.path.join(slurm_dir, model_file)
 
     # Fast Trainer
     logging.info("Beginning fast trainer...")
     from fast_calvo_trainer import FastCalvoTrainer
 
-    trainer = FastCalvoTrainer(inputs, settings, outputs)
+    trainer = FastCalvoTrainer(inputs, body['settings'], outputs)
     trainer.run()
 
     # Send response
@@ -135,19 +127,17 @@ try:
     results = {}
     with open(BM_RES, 'rb') as f:
         results['Background Model'] = base64.encodebytes(f.read()).decode('utf-8')
-    with open(MM_RES, 'rb') as f:
-        results["Music Symbol Model"] = base64.encodebytes(f.read()).decode("utf-8")
 
-    # Send response (for Optional named-layers)
+    # Send response (for Optional layers) "Model %d"
     for k in body["outputs"]:
-        if k == "Staff Lines Model":
-            with open(SM_RES, 'rb') as f:
-                results["Staff Lines Model"] = base64.encodebytes(f.read()).decode("utf-8")
-        if k == "Text Model":
-            with open(TM_RES, 'rb') as f:
-                results["Text Model"] = base64.encodebytes(f.read()).decode("utf-8")
+        if k[:5] == "Model":
+            l = k[6:7]
+            model = 'Model %d' % l
+            with open(outputs[model], 'rb') as f:
+                results[model] = base64.encodebytes(f.read()).decode("utf-8")
 
     body = json.dumps(results)
+
 except Exception as e:
     # We need to reply with something since the initial message was ACKed
     body = json.dumps({'error': str(e)})

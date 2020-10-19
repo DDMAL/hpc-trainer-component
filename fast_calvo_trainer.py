@@ -20,37 +20,25 @@ class FastCalvoTrainer:
         # Inputs/Outputs
         input_image = cv2.imread(self.inputs['Image'], True)
         background = cv2.imread(self.inputs['Background'], cv2.IMREAD_UNCHANGED)
-        notes = cv2.imread(self.inputs['Music Layer'], cv2.IMREAD_UNCHANGED)
         regions = cv2.imread(self.inputs['Selected Regions'], cv2.IMREAD_UNCHANGED)
         output_models_path = {
             'background': self.outputs['Background Model'],
-            'symbols': self.outputs['Music Symbol Model'],
         }
 
         # create categorical ground-truth
         gt = {}
         regions_mask = (regions[:, :, 3] == 255)
         gt['background'] = (background[:, :, 3] == 255) # background is already restricted to the selected regions (based on Pixel.js' behaviour)
-        
-        notes_mask = (notes[:, :, 3] == 255)
-        gt['symbols'] = np.logical_and(notes_mask, regions_mask) #restrict layer to only the notes in the selected regions
 
         # Optional named-layers
-        for k in self.inputs:
-            if k == 'Staff Layer':
-                lines = cv2.imread(self.inputs['Staff Layer'], cv2.IMREAD_UNCHANGED)
-                lines_mask = (lines[:, :, 3] == 255)
-                gt['staff'] = np.logical_and(lines_mask, regions_mask) # restrict layer to only the staff lines in the selected regions
-            if k ==  'Text':
-                text = cv2.imread(self.inputs['Text'], cv2.IMREAD_UNCHANGED)
-                text_mask = (text[:, :, 3] == 255)
-                gt['text'] = np.logical_and(text_mask, regions_mask) # restrict layer to only the text in the selected regions
+        input_ports = len([x for x in self.inputs if x[:17] == "rgba PNG - Layer "])
+        for i in range(input_ports):
+            layer = 'rgba PNG - Layer %d' % i
 
-        for k in self.outputs:
-            if k == 'Staff Lines Model':
-                output_models_path['staff'] = self.outputs['Staff Lines Model']
-            if k == 'Text Model':
-                output_models_path['text'] = self.outputs['Text Model']
+            file_ = cv2.imread(self.inputs[layer], cv2.IMREAD_UNCHANGED)
+            mask = (file_[:, :, 3] == 255)
+            gt[layer] = np.logical_and(mask, regions_mask)
+            output_models_path[layer] = self.outputs["Model %d" % i]
 
         # Call in training function
         status = training.train_msae(
