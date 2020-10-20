@@ -63,59 +63,63 @@ try:
     correlation_id = args.correlation_id
 
     slurm_dir = os.environ["SLURM_TMPDIR"]
-    body = None
     with open(input_file_path, 'r') as f:
         body = json.loads(f.read())
     os.remove(input_file_path)
 
-    inputs = body['inputs']
-    settings = body['settings']
-    logging.info(settings)
+    logging.info(body['settings'])
 
     # Download Resources
     base_url = "http://" + os.environ["RODAN_HOST"]
-    headers = {'Authorization': 'Token ' + settings['token']}
+    headers = {'Authorization': 'Token ' + body['settings']['token']}
     logging.info("Downloading resources from " + base_url)
 
+    # Handle reqired resources
+
+    # Input
     IMAGE_RES = os.path.join(slurm_dir, "image.png")
     BG_RES = os.path.join(slurm_dir, "background.png")
-    MS_RES = os.path.join(slurm_dir, "music.png")
-    SL_RES = os.path.join(slurm_dir, "staff.png")
-    TL_RES = os.path.join(slurm_dir, "text.png")
     SR_RES = os.path.join(slurm_dir, "regions.png")
 
+    # Output
     BM_RES = os.path.join(slurm_dir, "background.hdf5")
-    MM_RES = os.path.join(slurm_dir, "music.hdf5")
-    SM_RES = os.path.join(slurm_dir, "staff.hdf5")
-    TM_RES = os.path.join(slurm_dir, "text.hdf5")
 
-    download_resource(IMAGE_RES, base_url + inputs['Image'], headers)
-    download_resource(BG_RES, base_url + inputs['Background'], headers)
-    download_resource(MS_RES, base_url + inputs['Music Layer'], headers)
-    download_resource(SL_RES, base_url + inputs['Staff Layer'], headers)
-    download_resource(TL_RES, base_url + inputs['Text'], headers)
-    download_resource(SR_RES, base_url + inputs['Selected Regions'], headers)
+    # Download files from rodan
+    download_resource(IMAGE_RES, base_url + body['inputs']['Image'], headers)
+    download_resource(BG_RES, base_url + body['inputs']['Background'], headers)
+    download_resource(SR_RES, base_url + body['inputs']['Selected Regions'], headers)
 
     inputs = {
-            "Image": IMAGE_RES,
-            "Background": BG_RES,
-            "Music Layer": MS_RES,
-            "Staff Layer": SL_RES,
-            "Text": TL_RES,
-            "Selected Regions": SR_RES
-            }
+        "Image": IMAGE_RES,
+        "Background": BG_RES,
+        "Selected Regions": SR_RES
+    }
     outputs = {
-            "Background Model": BM_RES,
-            "Music Symbol Model": MM_RES,
-            "Staff Lines Model": SM_RES,
-            "Text Model": TM_RES
-            }
+        "Background Model": BM_RES,
+    }
+
+    # Handle Non-reqired resources
+    # Optional named-layers (Input and download) "rgba PNG - Layer %d"
+    for input_layer_name in body["inputs"]:
+        if input_layer_name[:17] == 'rgba PNG - Layer ':
+            port_number = input_layer_name[17:18]
+            layer_file = "layer_%d.png" % port_number
+            model_file = "model_%d.png" % port_number
+
+            # Declare input filepath
+            inputs['rgba PNG - Layer %d' % port_number] = os.path.join(slurm_dir, layer_file)
+
+            # Download File
+            download_resource(layer_file, base_url + body["inputs"]["rgba PNG - Layer %d" % port_number], headers)
+
+            # Declare output filepath
+            outputs['Model %d' % port_number] = os.path.join(slurm_dir, model_file)
 
     # Fast Trainer
     logging.info("Beginning fast trainer...")
     from fast_calvo_trainer import FastCalvoTrainer
 
-    trainer = FastCalvoTrainer(inputs, settings, outputs)
+    trainer = FastCalvoTrainer(inputs, body['settings'], outputs)
     trainer.run()
 
     # Send response
@@ -123,14 +127,17 @@ try:
     results = {}
     with open(BM_RES, 'rb') as f:
         results['Background Model'] = base64.encodebytes(f.read()).decode('utf-8')
-    with open(MM_RES, 'rb') as f:
-        results["Music Symbol Model"] = base64.encodebytes(f.read()).decode("utf-8")
-    with open(SM_RES, 'rb') as f:
-        results["Staff Lines Model"] = base64.encodebytes(f.read()).decode("utf-8")
-    with open(TM_RES, 'rb') as f:
-        results["Text Model"] = base64.encodebytes(f.read()).decode("utf-8")
+
+    # Send response (for Optional models) "Model %d"
+    for output_model_name in body["outputs"]:
+        if output_model_name[:5] == "Model":
+            port_number = output_model_name[6:7]
+            model = 'Model %d' % port_number
+            with open(outputs[model], 'rb') as f:
+                results[model] = base64.encodebytes(f.read()).decode("utf-8")
 
     body = json.dumps(results)
+
 except Exception as e:
     # We need to reply with something since the initial message was ACKed
     body = json.dumps({'error': str(e)})
