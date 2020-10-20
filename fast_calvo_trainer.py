@@ -30,15 +30,15 @@ class FastCalvoTrainer:
         regions_mask = (regions[:, :, 3] == 255)
         gt['background'] = (background[:, :, 3] == 255) # background is already restricted to the selected regions (based on Pixel.js' behaviour)
 
-        # Optional named-layers
+        # Optional layers
         input_ports = len([x for x in self.inputs if x[:17] == "rgba PNG - Layer "])
-        for i in range(input_ports):
-            layer = 'rgba PNG - Layer %d' % i
+        for port_number in range(input_ports):
+            layer = 'rgba PNG - Layer %d' % port_number
 
             file_ = cv2.imread(self.inputs[layer], cv2.IMREAD_UNCHANGED)
             mask = (file_[:, :, 3] == 255)
             gt[layer] = np.logical_and(mask, regions_mask)
-            output_models_path[layer] = self.outputs["Model %d" % i]
+            output_models_path[layer] = self.outputs["Model %d" % port_number]
 
         # Call in training function
         status = training.train_msae(

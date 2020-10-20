@@ -100,20 +100,20 @@ try:
 
     # Handle Non-reqired resources
     # Optional named-layers (Input and download) "rgba PNG - Layer %d"
-    for k in body["inputs"]:
-        if k[:17] == 'rgba PNG - Layer ':
-            l = k[17:18]
-            layer_file = "layer_%d.png" % l
-            model_file = "model_%d.png" % l
+    for input_layer_name in body["inputs"]:
+        if input_layer_name[:17] == 'rgba PNG - Layer ':
+            port_number = input_layer_name[17:18]
+            layer_file = "layer_%d.png" % port_number
+            model_file = "model_%d.png" % port_number
 
             # Declare input filepath
-            inputs['rgba PNG - Layer %d' % l] = os.path.join(slurm_dir, layer_file)
+            inputs['rgba PNG - Layer %d' % port_number] = os.path.join(slurm_dir, layer_file)
 
             # Download File
-            download_resource(layer_file, base_url + body["inputs"]["rgba PNG - Layer %d" % l], headers)
+            download_resource(layer_file, base_url + body["inputs"]["rgba PNG - Layer %d" % port_number], headers)
 
             # Declare output filepath
-            outputs['Model %d' % l] = os.path.join(slurm_dir, model_file)
+            outputs['Model %d' % port_number] = os.path.join(slurm_dir, model_file)
 
     # Fast Trainer
     logging.info("Beginning fast trainer...")
@@ -128,11 +128,11 @@ try:
     with open(BM_RES, 'rb') as f:
         results['Background Model'] = base64.encodebytes(f.read()).decode('utf-8')
 
-    # Send response (for Optional layers) "Model %d"
-    for k in body["outputs"]:
-        if k[:5] == "Model":
-            l = k[6:7]
-            model = 'Model %d' % l
+    # Send response (for Optional models) "Model %d"
+    for output_model_name in body["outputs"]:
+        if output_model_name[:5] == "Model":
+            port_number = output_model_name[6:7]
+            model = 'Model %d' % port_number
             with open(outputs[model], 'rb') as f:
                 results[model] = base64.encodebytes(f.read()).decode("utf-8")
 
