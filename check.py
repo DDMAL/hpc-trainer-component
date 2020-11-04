@@ -47,7 +47,7 @@ try:
             mail = settings['Slurm Notification Email']
 
             # Authenticate User
-            auth_url = "http://{}/api/auth/token/".format(os.environ["RODAN_HOST"])
+            auth_url = "https://{}/api/auth/token/".format(os.environ["RODAN_HOST"])
             logging.info("Attempting to authenticate at {}...".format(auth_url))
             payload = {'username': os.environ['RODAN_USER'], 'password': os.environ['RODAN_PASSWORD']}
             response = requests.post(auth_url, data=payload)

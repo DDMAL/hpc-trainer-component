@@ -70,7 +70,7 @@ try:
     logging.info(body['settings'])
 
     # Download Resources
-    base_url = "http://" + os.environ["RODAN_HOST"]
+    base_url = "https://" + os.environ["RODAN_HOST"]
     headers = {'Authorization': 'Token ' + body['settings']['token']}
     logging.info("Downloading resources from " + base_url)
 
