@@ -131,7 +131,7 @@ try:
     # Send response (for Optional models) "Model %d"
     for output_model_name in body["outputs"]:
         if output_model_name[:5] == "Model":
-            port_number = output_model_name[6:7]
+            port_number = int(output_model_name[6:7])
             model = 'Model %d' % port_number
             with open(outputs[model], 'rb') as f:
                 results[model] = base64.encodebytes(f.read()).decode("utf-8")
