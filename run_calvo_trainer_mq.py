@@ -102,7 +102,7 @@ try:
     # Optional named-layers (Input and download) "rgba PNG - Layer %d"
     for input_layer_name in body["inputs"]:
         if input_layer_name[:17] == 'rgba PNG - Layer ':
-            port_number = input_layer_name[17:18]
+            port_number = int(input_layer_name[17:18])
             layer_file = "layer_%d.png" % port_number
             model_file = "model_%d.png" % port_number
 
