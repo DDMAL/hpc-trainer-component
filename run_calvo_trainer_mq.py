@@ -5,6 +5,7 @@ import logging
 import json
 import ssl
 import sys
+import traceback
 import requests
 import pika
 
@@ -142,6 +143,7 @@ except Exception as e:
     # We need to reply with something since the initial message was ACKed
     body = json.dumps({'error': str(e)})
     logging.error(e)
+    logging.error(traceback.print_tb(e.__traceback__))
 finally:
     send_to_rabbitmq(response_queue, correlation_id, body)
 logging.info("Done")
