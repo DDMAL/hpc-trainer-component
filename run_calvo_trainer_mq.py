@@ -49,6 +49,8 @@ def download_resource(path, url, headers):
         for chunk in r.iter_content(chunk_size=128):
             f.write(chunk)
     logging.debug(path + " is ok")
+    kilobytes = os.path.getsize(path) / 8
+    logging.info(path + ": " + str(kilobytes) + " kB")
 
 # Set up resources
 try:
@@ -111,7 +113,7 @@ try:
             inputs['rgba PNG - Layer %d' % port_number] = os.path.join(slurm_dir, layer_file)
 
             # Download File
-            download_resource(layer_file, base_url + body["inputs"]["rgba PNG - Layer %d" % port_number], headers)
+            download_resource(os.path.join(slurm_dir, layer_file), base_url + body["inputs"]["rgba PNG - Layer %d" % port_number], headers)
 
             # Declare output filepath
             outputs['Model %d' % port_number] = os.path.join(slurm_dir, model_file)

@@ -35,6 +35,10 @@ class FastCalvoTrainer:
         for port_number in range(input_ports):
             layer = 'rgba PNG - Layer %d' % port_number
 
+            # Check if file exist (throws error if it doesn't)
+            with open(self.inputs[layer]) as f:
+                pass
+
             file_ = cv2.imread(self.inputs[layer], cv2.IMREAD_UNCHANGED)
             mask = (file_[:, :, 3] == 255)
             gt[layer] = np.logical_and(mask, regions_mask)
