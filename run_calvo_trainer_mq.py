@@ -128,16 +128,9 @@ try:
     # Send response
     logging.info("Preparing response")
     results = {}
-    with open(BM_RES, 'rb') as f:
-        results['Background Model'] = base64.encodebytes(f.read()).decode('utf-8')
-
-    # Send response (for Optional models) "Model %d"
-    for output_model_name in body["outputs"]:
-        if output_model_name[:5] == "Model":
-            port_number = int(output_model_name[6:7])
-            model = 'Model %d' % port_number
-            with open(outputs[model], 'rb') as f:
-                results[model] = base64.encodebytes(f.read()).decode("utf-8")
+    for model_name, path in outputs.items():
+        with open(path, 'rb') as f:
+            results[model_name] = base64.encodebytes(f.read()).decode("utf-8")
 
     body = json.dumps(results)
 
