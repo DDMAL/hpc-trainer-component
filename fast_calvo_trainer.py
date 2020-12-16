@@ -18,7 +18,14 @@ class FastCalvoTrainer:
         max_samples = self.settings['Maximum number of samples per label']
 
         # Inputs/Outputs
-        input_image = cv2.imread(self.inputs['Image'], True)
+        
+        # Shouldn't use codes, but the actual flag from the cv lib:
+        #   https://docs.opencv.org/master/d8/d6a/group__imgcodecs__flags.html
+        # Because not using flags breaks in newer versions of python CV2.
+        # input_image = cv2.imread(self.inputs['Image'], True)
+        input_image = cv2.imread(self.inputs['Image'], cv2.IMREAD_COLOR)
+
+        # To keep the Alpha channel, we use cv2.IMREAD_UNCHANGED. 
         background = cv2.imread(self.inputs['Background'], cv2.IMREAD_UNCHANGED)
         regions = cv2.imread(self.inputs['Selected Regions'], cv2.IMREAD_UNCHANGED)
         output_models_path = {
