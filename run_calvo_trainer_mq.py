@@ -111,7 +111,7 @@ try:
         if input_layer_name[:17] == 'rgba PNG - Layer ':
             port_number = int(input_layer_name[17:18])
             layer_file = "layer_%d.png" % port_number
-            model_file = "model_%d.png" % port_number
+            model_file = "model_%d.hdf5" % port_number
 
             # Declare input filepath
             inputs['rgba PNG - Layer %d' % port_number] = os.path.join(slurm_dir, layer_file)
