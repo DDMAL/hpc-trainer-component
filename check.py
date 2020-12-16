@@ -69,9 +69,11 @@ try:
             elif mem > 192000:
                 gpu_req = "--gres=gpu:p100l:4"
 
-            # Output the JSON body contents
-            with tempfile.NamedTemporaryFile(dir=".", delete=False) as f:
-                f.write(json.dumps(message).encode('utf-8'))
+            # Save the JSON body contents temporarily to disk.
+            with tempfile.NamedTemporaryFile("w", dir=".", delete=False) as f:
+                f.write(json.dumps(message))
+                f.flush()
+                logging.info("Reply queue: " + result[1].reply_to)
                 run_array = [
                     'sbatch',
                     '--cpus-per-task='+str(n_cpu),

@@ -68,7 +68,10 @@ try:
 
     slurm_dir = os.environ["SLURM_TMPDIR"]
     with open(input_file_path, 'r') as f:
-        body = json.loads(f.read())
+        try:
+            body = json.load(f)
+        except json.decoder.JSONDecodeError:
+            raise TypeError(f"Could not read the json file: {input_file_path}.")
     os.remove(input_file_path)
 
     logging.info(body['settings'])
