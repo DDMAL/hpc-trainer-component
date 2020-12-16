@@ -53,8 +53,8 @@ class FastCalvoTrainer:
 
         # Call in training function
         status = training.train_msae(
-            input_image,
-            gt,
+            input_image=input_image,
+            gt=gt,
             height=patch_height,
             width=patch_width,
             output_path=output_models_path,
