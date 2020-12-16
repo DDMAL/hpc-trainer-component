@@ -6,10 +6,11 @@ import ssl
 import subprocess
 import requests
 import tempfile
+import traceback
 
 
 logging.basicConfig(
-    format='%(asctime)s %(message)s',
+    format='%(asctime)s - %(levelname)-5.5s - %(filename)-25.25s:%(lineno)-4.4d - %(funcName)-15.15s  -->  %(message)s',
     filename='logs/check.log',
     level=logging.INFO
 )
@@ -90,6 +91,8 @@ try:
                 logging.info(sub_result.stdout)
                 job_id = sub_result.stdout.split(' ')[-1].strip()
                 logging.info("Preparing to submit dependency for job " + job_id)
+
+                # https://docs.computecanada.ca/wiki/Running_jobs#Cancellation_of_jobs_with_dependency_conditions_which_cannot_be_met
                 subprocess.run([
                     'sbatch',
                     '--dependency=afterany:' + job_id,
@@ -105,6 +108,5 @@ try:
             logging.info("No job present.")
 except pika.exceptions.AMQPConnectionError:
     logging.info("Could not connect.")
-except Exception as e:
-    logging.error("EXCEPTION")
-    logging.error(e)
+except Exception:
+    logging.error(traceback.format_exc())

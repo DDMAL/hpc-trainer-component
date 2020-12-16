@@ -11,7 +11,7 @@ import pika
 
 
 logging.basicConfig(
-    format='%(asctime)s %(message)s',
+    format='%(asctime)s - %(levelname)-5.5s - %(filename)-25.25s:%(lineno)-4.4d - %(funcName)-15.15s  -->  %(message)s',
     level=logging.INFO
 )
 
@@ -54,6 +54,7 @@ def download_resource(path, url, headers):
 
 # Set up resources
 try:
+    logging.info("Starting run_calvo_trainer_mq.py")
     parser = argparse.ArgumentParser()
     parser.add_argument("input_file", help="Path to input resource file")
     parser.add_argument("callback_queue", help="RabbitMQ queue to reply on")
@@ -119,7 +120,7 @@ try:
             outputs['Model %d' % port_number] = os.path.join(slurm_dir, model_file)
 
     # Fast Trainer
-    logging.info("Beginning fast trainer...")
+    logging.info("Initializing fast trainer...")
     from fast_calvo_trainer import FastCalvoTrainer
 
     trainer = FastCalvoTrainer(inputs, body['settings'], outputs)
@@ -134,11 +135,13 @@ try:
 
     body = json.dumps(results)
 
-except Exception as e:
+except Exception:
+    logging.error(traceback.format_exc())
+
     # We need to reply with something since the initial message was ACKed
-    body = json.dumps({'error': str(e)})
-    logging.error(e)
-    logging.error(traceback.print_tb(e.__traceback__))
-finally:
-    send_to_rabbitmq(response_queue, correlation_id, body)
+    # body = json.dumps({'error': str(e)})
+    # Would actually be better to use traceback.format_exc()
+    body = json.dumps({'error': str(traceback.format_exc())})
+
+send_to_rabbitmq(response_queue, correlation_id, body)
 logging.info("Done")
