@@ -46,7 +46,7 @@ job.
 
 1. Clone this repository [somewhere where jobs can be scheduled](https://docs.computecanada.ca/wiki/Running_jobs#Cluster_particularities).
 This is either `scratch` or a project directory on Cedar.
-2. Change directory to this repository's contents, which will now just be called `$PATH_TO_REPO`.
+2. Change directory to this repository's contents, which will now just be called `{path}`.
 3. Set up a virtual environment for Python 3.7 and install the necessary dependencies.
 ```bash
 module load python/3.7
@@ -58,7 +58,7 @@ pip install -r requirements.txt
   * `RABBITMQ_USER`, the user account for RabbitMQ.
   * `RABBITMQ_PASSWORD`, the corresponding password for RabbitMQ.
   * `RABBITMQ_HOST`, the IP address or host where RabbitMQ is on port 5672.
-  * `RODAN_USER`, the user account for Rodan.
+  * `RODAN_USER`, the user account, with enough permissions, for Rodan.
   * `RODAN_PASSWORD`, the corresponding password for Rodan.
   * `RODAN_HOST`, the IP address or host where the Rodan API is on port 80.
  
@@ -67,7 +67,9 @@ Make sure to add `export` to the start of each line with a variable.
 5. Add `run_check` to your crontab. For example to check for jobs every hour on the hour and log to a file
 called `logs/run_check.log`, run `crontab -e` and add the following line:
 ```sh
-0 * * * * $PATH_TO_REPO/run_check >> $PATH_TO_REPO/logs/run_check.log 2>&1
+0 * * * * SSL_CERT_FILE={location} {path}/run_check >> {path}/logs/run_check.log 2>&1
 ```
+* `{location}` = location of the SSL certificate, which can be aquired by `echo $SSL_CERT_FILE`.
+* `{path}` = hpc-trainer-component directory.
 
-*Note about cron: Environment variables don't carry into cron so make sure to set `SSL_CERT_FILE` to the correct value somewhere within the job so that Python's SSL module can actually check for valid CAs.*
+For example, the entire command may look like: `0 * * * * SSL_CERT_FILE='/etc/pki/tls/certs/ca-bundle.crt'  $PATH_TO_REPO/run_check >> $PATH_TO_REPO/logs/run_check.log 2>&1`
