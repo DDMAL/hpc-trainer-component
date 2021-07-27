@@ -61,6 +61,9 @@ pip install -r requirements.txt
   * `RODAN_USER`, the user account for Rodan.
   * `RODAN_PASSWORD`, the corresponding password for Rodan.
   * `RODAN_HOST`, the IP address or host where the Rodan API is on port 80.
+ 
+Make sure to add `export` to the start of each line with a variable.
+
 5. Add `run_check` to your crontab. For example to check for jobs every hour on the hour and log to a file
 called `logs/run_check.log`, run `crontab -e` and add the following line:
 ```sh
