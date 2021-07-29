@@ -57,7 +57,7 @@ pip install -r requirements.txt
 4. Export the proper environment variables in `credentials.env`. This *must* include:
   * `RABBITMQ_USER`, the user account for RabbitMQ.
   * `RABBITMQ_PASSWORD`, the corresponding password for RabbitMQ.
-  * `RABBITMQ_HOST`, the IP address or host where RabbitMQ is on port 5672.
+  * `RABBITMQ_HOST`, the IP address or host where RabbitMQ is on port 5671.
   * `RODAN_USER`, the user account, with enough permissions, for Rodan.
   * `RODAN_PASSWORD`, the corresponding password for Rodan.
   * `RODAN_HOST`, the IP address or host where the Rodan API is on port 80.
@@ -72,4 +72,4 @@ called `logs/run_check.log`, run `crontab -e` and add the following line:
 * `{location}` = location of the SSL certificate, which can be aquired by `echo $SSL_CERT_FILE`.
 * `{path}` = hpc-trainer-component directory.
 
-For example, the entire command may look like: `0 * * * * SSL_CERT_FILE='/etc/pki/tls/certs/ca-bundle.crt'  $PATH_TO_REPO/run_check >> $PATH_TO_REPO/logs/run_check.log 2>&1`
+For example, the entire command may look like: `0 * * * * SSL_CERT_FILE='/etc/pki/tls/certs/ca-bundle.crt'  ~/scratch/hpc-trainer-component/run_check >> ~/scratch/hpc-trainer-component/logs/run_check.log 2>&1`
