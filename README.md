@@ -62,7 +62,7 @@ pip install -r requirements.txt
   * `RODAN_PASSWORD`, the corresponding password for Rodan.
   * `RODAN_HOST`, the IP address or host where the Rodan API is on port 80.
  
-Make sure to add `export` to the start of each line with a variable. The credentials for RabbitMQ can be found in the [rodan-docker (private) repository](https://github.com/DDMAL/rodan-docker/tree/master/hpc-rabbitmq/scripts). For rodan, make sure to use the credentials of a user with enough permissions.
+Make sure to add `export` to the start of each line with a variable. The credentials for `RABBITMQ_USER` and `RABBITMQ_PASSWORD` can be found in the [rodan-docker (private) repository](https://github.com/DDMAL/rodan-docker/tree/master/hpc-rabbitmq/scripts). For the host in `RABBITMQ_HOST` and `RODAN_HOST`, use `rodan2.simssa.ca`. For rodan's host and password, make sure to use the credentials of a user with enough permissions.
 
 5. Add `run_check` to your crontab. For example to check for jobs every hour on the hour and log to a file
 called `logs/run_check.log`, run `crontab -e` and add the following line:
