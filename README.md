@@ -48,28 +48,37 @@ job.
 This is either `scratch` or a project directory on Cedar.
 2. Change directory to this repository's contents, which will now just be called `{path}`.
 3. Set up a virtual environment for Python 3.7 and install the necessary dependencies.
-```bash
-module load python/3.7
-virtualenv env
-source env/bin/activate
-pip install -r requirements.txt
-```
-4. Export the proper environment variables in `credentials.env`. This *must* include:
-  * `RABBITMQ_USER`, the user account for RabbitMQ.
-  * `RABBITMQ_PASSWORD`, the corresponding password for RabbitMQ.
-  * `RABBITMQ_HOST`, the IP address or host where RabbitMQ is on port 5671.
-  * `RODAN_USER`, the user account, with enough permissions, for Rodan.
-  * `RODAN_PASSWORD`, the corresponding password for Rodan.
-  * `RODAN_HOST`, the IP address or host where the Rodan API is on port 80.
- 
-Make sure to add `export` to the start of each line with a variable. The credentials for `RABBITMQ_USER` and `RABBITMQ_PASSWORD` can be found in the [rodan-docker (private) repository](https://github.com/DDMAL/rodan-docker/tree/master/hpc-rabbitmq/scripts). For the host in `RABBITMQ_HOST` and `RODAN_HOST`, use `rodan2.simssa.ca`. For rodan's host and password, make sure to use the credentials of a user with enough permissions.
+    ```bash
+    module load python/3.7
+    virtualenv env
+    source env/bin/activate
+    pip install -r requirements.txt
+    ```
+    This environment is activated by [run_check](./run_check).
+4. Set up a second virtual environment for the calvo code, also using Python 3.7.
+    ```bash
+    module load python/3.7
+    virtualenv calvo_env
+    source calvo_env/bin/activate
+    pip install -r calvo_requirements.txt
+    ```
+    This environment gets activated by [hpc_training.sh](./hpc_training.sh).
+5. Export the proper environment variables in `credentials.env`. This *must* include:
+   * `RABBITMQ_USER`, the user account for RabbitMQ.
+   * `RABBITMQ_PASSWORD`, the corresponding password for RabbitMQ.
+   * `RABBITMQ_HOST`, the IP address or host where RabbitMQ is on port 5671.
+   * `RODAN_USER`, the user account, with enough permissions, for Rodan.
+   * `RODAN_PASSWORD`, the corresponding password for Rodan.
+   * `RODAN_HOST`, the IP address or host where the Rodan API is on port 80. 
 
-5. Add `run_check` to your crontab. For example to check for jobs every hour on the hour and log to a file
+    Make sure to add `export` to the start of each line with a variable. The credentials for `RABBITMQ_USER` and `RABBITMQ_PASSWORD` can be found in the [rodan-docker (private) repository](https://github.com/DDMAL/rodan-docker/tree/master/hpc-rabbitmq/scripts). For the host in `RABBITMQ_HOST` and `RODAN_HOST`, use `rodan2.simssa.ca`. For rodan's host and password, make sure to use the credentials of a user with enough permissions.
+
+6. Add `run_check` to your crontab. For example to check for jobs every hour on the hour and log to a file
 called `logs/run_check.log`, run `crontab -e` and add the following line:
-```sh
-0 * * * * SSL_CERT_FILE={location} {path}/run_check >> {path}/logs/run_check.log 2>&1
-```
-* `{location}` = location of the SSL certificate, which can be aquired by `echo $SSL_CERT_FILE`.
-* `{path}` = hpc-trainer-component directory.
+    ```sh
+    0 * * * * SSL_CERT_FILE={location} {path}/run_check >> {path}/logs/run_check.log 2>&1
+    ```
+    * `{location}` = location of the SSL certificate, which can be aquired by `echo $SSL_CERT_FILE`.
+    * `{path}` = hpc-trainer-component directory.
 
-For example, the entire command may look like: `0 * * * * SSL_CERT_FILE='/etc/pki/tls/certs/ca-bundle.crt'  ~/scratch/hpc-trainer-component/run_check >> ~/scratch/hpc-trainer-component/logs/run_check.log 2>&1`
+    For example, the entire command may look like: `0 * * * * SSL_CERT_FILE='/etc/pki/tls/certs/ca-bundle.crt'  ~/scratch/hpc-trainer-component/run_check >> ~/scratch/hpc-trainer-component/logs/run_check.log 2>&1`
